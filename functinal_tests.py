@@ -40,12 +40,20 @@ class NewVisitorTest(unittest.TestCase):
 
         #页面又显示了一个文本框，可以输入其他的待办事项
         #他在文本框里输入了“Send a gift to lisi” (送礼物给李四)
-        self.fail('Finish the test!')
+        inputbox = self.browser.find_element(By.ID,'id_new_item')
+        inputbox.send_keys('Send a gift to lisi')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         #页面再次更新，清单里显示了这两个待办事项
+        table = self.browser.find_element(By.ID,'id_list_table')
+        rows = table.find_elements(By.TAG_NAME,'tr')
+        self.assertIn('1: Buy flowers', [row.text for row in rows])
+        self.assertIn('2: Send a gift to lisi', [row.text for row in rows])
 
         #张三想知道这个网站是否会记住他的待办事项，他看到页面上有一个唯一的URL链接指向这个待办事项清单
         #他访问了这个URL，发现他的待办事项清单还在
+        self.fail('Finish the test!')
 
 if __name__ == '__main__':
     unittest.main()
