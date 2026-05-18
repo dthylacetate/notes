@@ -8,6 +8,9 @@ import time
 import unittest
 from selenium.webdriver.common.by import By
 from django.test import LiveServerTestCase
+from selenium.common.exceptions import WebDriverException
+
+MAX_WAIT = 10
 
 class NewVisitorTest(LiveServerTestCase):
 
@@ -16,6 +19,19 @@ class NewVisitorTest(LiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    def wait_for_row_in_list_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID,'id_list_table')
+                rows = table.find_elements(By.TAG_NAME,'tr')
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
     
     def check_for_row_in_list_table(self, row_text):
         table = self.browser.find_element(By.ID,'id_list_table')
@@ -39,19 +55,17 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys('Buy flowers')
         #当他按下回车键后，页面更新了，待办事项表格里显示了“1: Buy flowers”
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
-        self.check_for_row_in_list_table('1: Buy flowers')
+        self.wait_for_row_in_list_table('1: Buy flowers')
 
         #页面又显示了一个文本框，可以输入其他的待办事项
         #他在文本框里输入了“Send a gift to lisi” (送礼物给李四)
         inputbox = self.browser.find_element(By.ID,'id_new_item')
         inputbox.send_keys('Send a gift to lisi')
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         #页面再次更新，清单里显示了这两个待办事项
-        self.check_for_row_in_list_table('1: Buy flowers')
-        self.check_for_row_in_list_table('2: Send a gift to lisi')
+        self.wait_for_row_in_list_table('1: Buy flowers')
+        self.wait_for_row_in_list_table('2: Send a gift to lisi')
 
         #张三想知道这个网站是否会记住他的待办事项，他看到页面上有一个唯一的URL链接指向这个待办事项清单
         #他访问了这个URL，发现他的待办事项清单还在
