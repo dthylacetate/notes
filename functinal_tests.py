@@ -1,8 +1,11 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
 import unittest
+from selenium.webdriver.common.by import By
 
 class NewVisitorTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.browser = webdriver.Chrome()
 
@@ -15,18 +18,25 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get('http://localhost:8000')
 
         #他注意到网页里包含了“To-Do”这个词
-
         self.assertIn('To-Do', self.browser.title),"browser title was " + self.browser.title
-        self.fail('Finish the test!')
+        header_text=self.browser.find_element(By.TAG_NAME,'h1').text
+        self.assertIn('To-Do', header_text)
 
         #应用有一个输入待办事项的文本框，邀请他输入一个待办事项
-
+        inputbox = self.browser.find_element(By.ID,'id_new_item')
+        self.assertEqual(inputbox.get_attribute('placeholder'),'Enter a to-do item')
         #他在文本框里输入了“Buy flowers” (买花)
-
+        inputbox.send_keys('Buy flowers')
         #当他按下回车键后，页面更新了，待办事项表格里显示了“1: Buy flowers”
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+        table = self.browser.find_element(By.ID,'id_list_table')
+        rows = table.find_elements(By.TAG_NAME,'tr')
+        self.assertIn('1: Buy flowers', [row.text for row in rows])
 
         #页面又显示了一个文本框，可以输入其他的待办事项
         #他在文本框里输入了“Send a gift to lisi” (送礼物给李四)
+        self.fail('Finish the test!')
 
         #页面再次更新，清单里显示了这两个待办事项
 
