@@ -12,4 +12,5 @@ def home_page(request):
         'new_item_text': item.text
         })
  
+ 
 # Create your views here.
