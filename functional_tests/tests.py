@@ -73,6 +73,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox=self.browser.find_element(By.ID,'id_new_item')
         inputbox.send_keys('Buy flowers')
         inputbox.send_keys(Keys.ENTER)
+        
         self.wait_for_row_in_list_table('1: Buy flowers')
 
         #他注意到这个清单有唯一的url
