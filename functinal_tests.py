@@ -1,3 +1,7 @@
+import os
+# 强制让 Selenium 进入离线模式，直接使用你刚才已经下载好的本地 148 驱动
+os.environ["SE_OFFLINE"] = "true"
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
